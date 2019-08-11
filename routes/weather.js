@@ -2,16 +2,21 @@ const express = require('express');
 const router = express.Router();
 const Weather = require('../models/weather.model.js');
 
-router.post('/create', createWeather);
+router.get('/', list)
+router.post('/create', create);
 
 module.exports = router;
 
+function list(req, res, next) {
+  Weather.find({}, function(err, result) {
+    if (err) next(err);
+    return res.status(200).send(result);
+  }).select("weather_id").sort("weather_id");
+}
 
-function createWeather(req, res, next) {
+function create(req, res, next) {
   let weather = req.body;
-  console.log(weather.weather_id);
   Weather.findOne({weather_id: weather.weather_id }, function(err, result) {
-    console.log(err);
     if (err) next(err);
     if (result) {
       return res.status(400).send(`There already exists weather data with id: ${weather.weather_id}`);
