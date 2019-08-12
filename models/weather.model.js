@@ -2,7 +2,7 @@ const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
 let WeatherSchema = new Schema({
-  weather_id: {type: Number, required: true },
+  id: {type: Number, required: true },
   date: {type: Date, required: true },
   temperature: {type: Array, required: true },
   location: {

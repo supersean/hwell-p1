@@ -7,27 +7,44 @@ router.post('/create', create);
 
 module.exports = router;
 
+initWeatherData(require('../models/create_weather_data.js'));
+
+function initWeatherData(data) {
+  for(var i = 0; i < data.length; i++) {
+    createWeather(data[i], function(err) {
+      if (err) console.log(err);
+    });
+  }
+}
+
 function list(req, res, next) {
-  Weather.find({}, function(err, result) {
-    if (err) next(err);
-    return res.status(200).send(result);
-  }).select("weather_id").sort("weather_id");
+  allWeatherById(function(err, weatherData) {
+      if (err) next(err);
+      res.status(200).send(weatherData);
+  });
 }
 
 function create(req, res, next) {
   let weather = req.body;
-  Weather.findOne({weather_id: weather.weather_id }, function(err, result) {
-    if (err) next(err);
-    if (result) {
-      return res.status(400).send(`There already exists weather data with id: ${weather.weather_id}`);
-    }
-
-    let newWeather = new Weather(weather);
-    newWeather.save(function (err) {
-      if (err) {
-        return next(err);
-      }
-      return res.status(201).send(weather);
-    })
+  createWeather(weather, function(err, newWeatherData) {
+    if (err) return res.status(400).send(err);
+    res.status(201).send(newWeatherData);
   });
 };
+
+function findWeather(weather, callback) {
+    Weather.findOne({id: weather.id}, callback);
+}
+
+function createWeather(weather, callback) {
+  findWeather(weather, function(err, queriedWeather) {
+      if (err) return callback(`Something went wrong checking if weather data exists`);
+      if (queriedWeather) return callback(`There already exists weather data with id: ${queriedWeather.id}`);
+
+      new Weather(weather).save(callback);
+  });
+}
+
+function allWeatherById(callback) {
+  Weather.find({}, callback).select("id").sort("id");
+}
