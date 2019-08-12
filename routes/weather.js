@@ -100,8 +100,8 @@ function createWeather(weather, callback) {
 }
 
 function allWeatherById(callback) {
-  Weather.find({}, callback).select("id").sort("id");
-}``
+  Weather.find({}, callback).sort("id");
+}
 
 function allWeatherByLatLon(coordinates, callback) {
   const query = {};

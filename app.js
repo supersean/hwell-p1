@@ -5,7 +5,7 @@ const bodyParser = require('body-parser');
 const app = express();
 const password = process.env.MONGO_PASSWORD;
 
-// const erase = require('./routes/erase.js');
+const erase = require('./routes/erase.js');
 const weather = require('./routes/weather.js');
 
 
@@ -22,7 +22,7 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended: false}));
 
 app.use('/weather', weather);
-// app.use('/erase', erase);
+app.use('/erase', erase);
 
 let port = 3000;
 app.listen(port, () => {
