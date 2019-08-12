@@ -18,10 +18,19 @@ function initWeatherData(data) {
 }
 
 function list(req, res, next) {
-  allWeatherById(function(err, weatherData) {
-      if (err) next(err);
-      res.status(200).send(weatherData);
-  });
+  if (req.query.lat && req.query.lon) {
+    allWeatherByLatLon({lat: req.query.lat, lon: req.query.lon}, function(err, weatherData) {
+        if (err) next(err);
+        if (weatherData.length == 0) return res.status(404).send(weatherData);
+        res.status(200).send(weatherData);
+    });
+  } else {
+    allWeatherById(function(err, weatherData) {
+        if (err) next(err);
+        res.status(200).send(weatherData);
+    });
+  }
+
 }
 
 function create(req, res, next) {
@@ -47,4 +56,11 @@ function createWeather(weather, callback) {
 
 function allWeatherById(callback) {
   Weather.find({}, callback).select("id").sort("id");
+}
+
+function allWeatherByLatLon(coordinates, callback) {
+  const query = {};
+  if (coordinates.lat) query["location.lat"] = coordinates.lat;
+  if (coordinates.lon) query["location.lon"] = coordinates.lon;
+  Weather.find(query, callback)
 }
